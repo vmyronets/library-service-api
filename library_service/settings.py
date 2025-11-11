@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "rest_framework",
     "books",
-    "users",
+    "user",
 ]
 
 MIDDLEWARE = [
@@ -73,7 +73,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'library_service.wsgi.application'
 
-AUTH_USER_MODEL = "users.User"
+AUTH_USER_MODEL = "user.User"
 
 
 # Database
