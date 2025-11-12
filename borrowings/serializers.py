@@ -1,4 +1,3 @@
-from django.template.context_processors import request
 from rest_framework import serializers
 from borrowings.models import Borrowing
 from books.serializers import BookSerializer
