@@ -2,7 +2,6 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from django_filters.rest_framework import DjangoFilterBackend
 from borrowings.models import Borrowing
 from borrowings.serializers import (
     BorrowingSerializer,
@@ -13,17 +12,16 @@ from rest_framework.exceptions import ValidationError
 
 class BorrowingViewSet(viewsets.ModelViewSet):
     queryset = Borrowing.objects.select_related("book", "user")
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ["is_active", "user_id"]
     # permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
         queryset = super().get_queryset()
+
         if not user.is_staff:
             queryset = queryset.filter(user=user)
         else:
-            user_id = self.queryset.query_params.get("user_id")
+            user_id = self.request.query_params.get("user_id")
             if user_id:
                 queryset = queryset.filter(user_id=user_id)
         return queryset
