@@ -5,14 +5,16 @@ from rest_framework.permissions import IsAuthenticated
 from borrowings.models import Borrowing
 from borrowings.serializers import (
     BorrowingSerializer,
-    BorrowingCreateSerializer
+    BorrowingListSerializer,
+    BorrowingDetailSerializer,
+    BorrowingCreateSerializer,
 )
 from rest_framework.exceptions import ValidationError
 
 
 class BorrowingViewSet(viewsets.ModelViewSet):
     queryset = Borrowing.objects.select_related("book", "user")
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
@@ -31,11 +33,18 @@ class BorrowingViewSet(viewsets.ModelViewSet):
         return queryset
 
     def get_serializer_class(self):
+        if self.action == "list":
+            return BorrowingListSerializer
+
+        if self.action == "retrieve":
+            return BorrowingDetailSerializer
+
         if self.action == "create":
             return BorrowingCreateSerializer
+
         return BorrowingSerializer
 
-    @action(detail=True, methods=["post"])
+    @action(detail=True, methods=["post"], url_path="return")
     def return_book(self, request, pk=None):
         borrowing = self.get_object()
         try:
