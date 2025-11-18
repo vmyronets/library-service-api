@@ -2,6 +2,8 @@ from django.db import models
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 from django.conf import settings
+from django.utils.translation.trans_real import translation
+
 from books.models import Book
 
 
@@ -25,9 +27,11 @@ class Borrowing(models.Model):
                 "Expected return date must be after borrow date"
             )
 
+    @translation.atomic
     def return_book(self):
         if not self.is_active:
             raise ValidationError("This borrowing is already returned")
+
         self.actual_return_date = timezone.now().date()
         self.is_active = False
         self.book.inventory += 1
