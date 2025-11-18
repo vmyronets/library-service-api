@@ -5,33 +5,46 @@ from rest_framework.permissions import IsAuthenticated
 from borrowings.models import Borrowing
 from borrowings.serializers import (
     BorrowingSerializer,
-    BorrowingCreateSerializer
+    BorrowingListSerializer,
+    BorrowingDetailSerializer,
+    BorrowingCreateSerializer,
 )
 from rest_framework.exceptions import ValidationError
 
 
 class BorrowingViewSet(viewsets.ModelViewSet):
     queryset = Borrowing.objects.select_related("book", "user")
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
-        queryset = super().get_queryset()
+        user_id = self.request.query_params.get("user_id")
+        is_active = self.request.query_params.get("is_active")
+
+        queryset = self.queryset
 
         if not user.is_staff:
             queryset = queryset.filter(user=user)
-        else:
-            user_id = self.request.query_params.get("user_id")
-            if user_id:
-                queryset = queryset.filter(user_id=user_id)
+        if user_id:
+            queryset = queryset.filter(user_id=user_id)
+        if is_active:
+            queryset = queryset.filter(is_active=is_active)
+
         return queryset
 
     def get_serializer_class(self):
+        if self.action == "list":
+            return BorrowingListSerializer
+
+        if self.action == "retrieve":
+            return BorrowingDetailSerializer
+
         if self.action == "create":
             return BorrowingCreateSerializer
+
         return BorrowingSerializer
 
-    @action(detail=True, methods=["post"])
+    @action(detail=True, methods=["post"], url_path="return")
     def return_book(self, request, pk=None):
         borrowing = self.get_object()
         try:

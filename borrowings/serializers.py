@@ -4,8 +4,36 @@ from books.serializers import BookSerializer
 
 
 class BorrowingSerializer(serializers.ModelSerializer):
-    book = BookSerializer(read_only=True)
-    user = serializers.StringRelatedField(read_only=True)
+    class Meta:
+        model = Borrowing
+        fields = (
+            "id",
+            "book",
+            "user",
+            "borrow_date",
+            "expected_return_date",
+            "actual_return_date"
+        )
+
+
+class BorrowingListSerializer(BorrowingSerializer):
+    book = serializers.SlugRelatedField(
+        many=False, read_only=True, slug_field="title"
+    )
+    user = serializers.SlugRelatedField(
+        many=False, read_only=True, slug_field="full_name"
+    )
+
+    class Meta:
+        model = Borrowing
+        fields = ("id", "book", "user", "borrow_date")
+
+
+class BorrowingDetailSerializer(BorrowingSerializer):
+    book = BookSerializer(many=False, read_only=True)
+    user = serializers.SlugRelatedField(
+        many=False, read_only=True, slug_field="full_name"
+    )
 
     class Meta:
         model = Borrowing
@@ -14,7 +42,6 @@ class BorrowingSerializer(serializers.ModelSerializer):
             "book",
             "user",
             "borrow_date",
-
             "expected_return_date",
             "actual_return_date"
         )
