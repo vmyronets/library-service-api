@@ -1,6 +1,9 @@
+from django.db import transaction
 from rest_framework import serializers
+
 from borrowings.models import Borrowing
 from books.serializers import BookSerializer
+from notifications.telegram import send_telegram_notification
 
 
 class BorrowingSerializer(serializers.ModelSerializer):
@@ -63,9 +66,19 @@ class BorrowingCreateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user_request = self.context.get("request")
         book = validated_data.get("book")
-        book.inventory -= 1
-        book.save()
-        borrowing = Borrowing.objects.create(
-            user=user_request.user, book=book, **validated_data
+        with transaction.atomic():
+            book.inventory -= 1
+            book.save()
+            borrowing = Borrowing.objects.create(
+                user=user_request.user, book=book, **validated_data
+            )
+
+        message = (
+            f"<b>NEW BORROWING</b>\n"
+            f"User: {user_request.user.full_name} (ID: {user.id})\n"
+            f"Book: {book.title} (ID: {book.id})"
+            f"Expected return date: {borrowing.expected_return_date}"
         )
+        send_telegram_notification(message)
+
         return borrowing
