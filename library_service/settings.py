@@ -11,8 +11,9 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 import os
-from pathlib import Path
 from dotenv import load_dotenv
+from pathlib import Path
+from datetime import timedelta
 
 load_dotenv()
 
@@ -163,7 +164,7 @@ SIMPLE_JWT = {
 
 # django_q settings
 Q_CLUSTER = {
-    "name": "DjangORM",
+    "name": "DjangoQ",
     "workers": 4,
     "timeout": 90,
     "retry": 120,
