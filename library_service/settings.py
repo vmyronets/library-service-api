@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     "rest_framework_simplejwt",
     "rest_framework",
+    "django_q",
     "books",
     "borrowings",
     "notifications",
@@ -138,3 +139,19 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # telegram bot token and chat_id
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+
+# django_q settings
+Q_CLUSTER = {
+    "name": "DjangORM",
+    "workers": 4,
+    "timeout": 90,
+    "retry": 120,
+    "queue_limit": 50,
+    "bulk": 10,
+    "orm": "default",
+    "redis": {
+        "host": "redis",
+        "port": 6379,
+        "db": 0,
+    }
+}
