@@ -163,7 +163,7 @@ SIMPLE_JWT = {
 
 # django_q settings
 Q_CLUSTER = {
-    "name": "DjangORM",
+    "name": "DjangoQ",
     "workers": 4,
     "timeout": 90,
     "retry": 120,
