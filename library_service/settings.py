@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     "rest_framework_simplejwt",
     "rest_framework",
+    "django_q",
     "books",
     "borrowings",
     "notifications",
@@ -157,4 +158,21 @@ SIMPLE_JWT = {
     "ROTATE_REFRESH_TOKENS": False,
     "AUTH_HEADER_TYPES": ("Bearer",),
     "AUTH_HEADER_NAME": "Authorize",
+}
+
+
+# django_q settings
+Q_CLUSTER = {
+    "name": "DjangORM",
+    "workers": 4,
+    "timeout": 90,
+    "retry": 120,
+    "queue_limit": 50,
+    "bulk": 10,
+    "orm": "default",
+    "redis": {
+        "host": "redis",
+        "port": 6379,
+        "db": 0,
+    }
 }
