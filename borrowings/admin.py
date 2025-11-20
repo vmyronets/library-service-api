@@ -14,5 +14,5 @@ class BorrowingAdmin(admin.ModelAdmin):
         "is_active"
     )
     list_filter = ("book", "user")
-    search_fields =("book__title", "user__is_active")
+    search_fields =("book__title", "is_active")
     ordering = ("-borrow_date",)
