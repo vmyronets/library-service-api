@@ -24,8 +24,20 @@ class Borrowing(models.Model):
     def clean(self):
         if self.expected_return_date <= self.borrow_date:
             raise ValidationError(
-                "Expected return date must be after borrow date"
+                "Expected return date must be after borrow date."
             )
+        if (
+            self.is_active and self.expected_return_date
+            <= timezone.now().date()
+        ):
+            raise ValidationError(
+                "Expected return date must be in the future."
+            )
+        if self.book.inventory <= 0:
+            raise ValidationError("This book is not available right now.")
+
+        if self.is_active:
+            raise ValidationError("This book is already borrowed.")
 
     @transaction.atomic
     def return_book(self):
