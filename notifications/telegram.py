@@ -25,4 +25,5 @@ def send_telegram_notification(message: str):
         return response.json().get("ok", False)
     except requests.exceptions.RequestException as e:
         print(f"Error sending Telegram notification: {e}")
+
         return False
