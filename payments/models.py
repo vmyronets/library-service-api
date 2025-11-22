@@ -8,7 +8,6 @@ class Payment(models.Model):
     class PaymentStatus(models.TextChoices):
         PENDING = "PENDING", "Pending"
         PAID = "PAID", "Paid"
-        EXPIRED = "EXPIRED", "Expired"
 
     class PaymentType(models.TextChoices):
         PAYMENT = "PAYMENT", "Payment for borrowing"
@@ -19,7 +18,11 @@ class Payment(models.Model):
         choices=PaymentStatus.choices,
         default=PaymentStatus.PENDING
     )
-    type = models.CharField(max_length=7, choices=PaymentType.choices)
+    type = models.CharField(
+        max_length=7,
+        choices=PaymentType.choices,
+        default=PaymentType.PAYMENT
+    )
     borrowing = models.OneToOneField(
         Borrowing,
         on_delete=models.CASCADE,
@@ -35,4 +38,4 @@ class Payment(models.Model):
     )
 
     def __str__(self):
-        return f"{self.type} - {self.status} for borrowing {self.borrowing_id}"
+        return f"{self.type} - {self.status} for borrowing {self.borrowing.id}"
