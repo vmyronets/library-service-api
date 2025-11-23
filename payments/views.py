@@ -2,7 +2,7 @@ import stripe
 
 from django.conf import settings
 from django.http import JsonResponse
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from payments.models import Payment
@@ -11,12 +11,7 @@ from payments.serializers import PaymentSerializer, PaymentDetailSerializer
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
-class PaymentViewSet(
-    mixins.CreateModelMixin,
-    mixins.RetrieveModelMixin,
-    mixins.ListModelMixin,
-    viewsets.GenericViewSet
-):
+class PaymentViewSet(viewsets.ModelViewSet):
     queryset = Payment.objects.all()
 
     def get_serializer_class(self):
@@ -37,22 +32,24 @@ class PaymentViewSet(
         permission_classes=[IsAuthenticated]
     )
     def session_checkout(self, request, pk=None):
-        url = "http://localhost:8000/api/v1/payments/"
+        domain_url = "http://localhost:8000/api/v1/payments/"
         checkout_session = stripe.checkout.Session.create(
-            success_url=url + str(pk) + "/success/",
-            cancel_url=url + str(pk) + "/cancel/",
+            success_url=domain_url + str(pk) + "/success/",
+            cancel_url=domain_url + str(pk) + "/cancel/",
             payment_method_types=["card"],
             mode="payment",
-            line_items=[{
-                "price_data": {
-                    "currency": "usd",
-                    "product_data": {
-                        "name": "Borrowing",
+            line_items=[
+                {
+                    "price_data": {
+                        "currency": "usd",
+                        "product_data": {
+                            "name": "Borrowing",
+                        },
+                        "unit_amount": 1000,
                     },
-                    "unit_amount": 1000,
-                },
-                "quantity": 1,
-            }]
+                    "quantity": 1,
+                }
+            ]
         )
         return JsonResponse(
             {
