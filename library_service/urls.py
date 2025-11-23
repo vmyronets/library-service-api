@@ -25,4 +25,7 @@ urlpatterns = [
         "api/v1/borrowings/",
         include("borrowings.urls", namespace="borrowings")
     ),
+    path(
+        "api/v1/payments/", include("payments.urls", namespace="payments")
+    ),
 ]
