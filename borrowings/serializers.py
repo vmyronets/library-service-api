@@ -17,6 +17,7 @@ class BorrowingSerializer(serializers.ModelSerializer):
             "expected_return_date",
             "actual_return_date"
         )
+        read_only_fields = ("id", "actual_return_date", "user")
 
 
 class BorrowingListSerializer(BorrowingSerializer):
@@ -48,6 +49,7 @@ class BorrowingDetailSerializer(BorrowingSerializer):
             "expected_return_date",
             "actual_return_date"
         )
+        read_only_fields = ("id", "actual_return_date", "user")
 
 
 class BorrowingCreateSerializer(serializers.ModelSerializer):

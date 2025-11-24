@@ -1,5 +1,4 @@
 from django.db import models
-from django.utils import timezone
 from django.core.exceptions import ValidationError
 from django.conf import settings
 from django.db import transaction
@@ -8,7 +7,10 @@ from books.models import Book
 
 
 class Borrowing(models.Model):
-    borrow_date = models.DateField(default=timezone.now)
+    borrow_date = models.DateField(
+        auto_now_add=True,
+        verbose_name="Borrow date"
+    )
     expected_return_date = models.DateField()
     actual_return_date = models.DateField(null=True, blank=True)
     user = models.ForeignKey(
