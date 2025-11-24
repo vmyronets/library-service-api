@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     "rest_framework_simplejwt",
     "rest_framework",
-    "django_q",
+    "django_celery_beat",
     "books",
     "borrowings",
     "notifications",
@@ -162,19 +162,10 @@ SIMPLE_JWT = {
     "AUTH_HEADER_NAME": "Authorize",
 }
 
-
-# django_q settings
-Q_CLUSTER = {
-    "name": "DjangoQ",
-    "workers": 4,
-    "timeout": 90,
-    "retry": 120,
-    "queue_limit": 50,
-    "bulk": 10,
-    "orm": "default",
-    "redis": {
-        "host": "redis",
-        "port": 6379,
-        "db": 0,
-    }
-}
+# Celery Configuration
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL")
+CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND")
+CELERY_ACCEPT_CONTENT = ["application/json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = "UTC"
