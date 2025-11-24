@@ -53,12 +53,11 @@ class PaymentViewSet(viewsets.ModelViewSet):
 
     @action(methods=["GET"], detail=True, url_path="cancel")
     def payment_cancel(self, request, pk=None):
-        """
-        Сюди потрапляємо, якщо користувач натиснув 'Back' або скасував оплату в Stripe.
-        """
+        """If the user cancels the payment, we return a message to him."""
         return Response(
             {
-                "message": "Payment was cancelled. You can try again later within 24 hours."
+                "message": "Payment was cancelled. "
+                           "You can try again later within 24 hours."
             },
             status=status.HTTP_200_OK
         )
