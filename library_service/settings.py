@@ -26,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-*w_$&(p7_%8cqxg&x1oqhevec=q4-$d0=-gx(f=j4c(lys@g2a'
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -45,10 +45,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     "rest_framework_simplejwt",
     "rest_framework",
-    "django_q",
+    "django_celery_beat",
     "books",
     "borrowings",
     "notifications",
+    "payments",
     "users",
 ]
 
@@ -161,19 +162,10 @@ SIMPLE_JWT = {
     "AUTH_HEADER_NAME": "Authorize",
 }
 
-
-# django_q settings
-Q_CLUSTER = {
-    "name": "DjangoQ",
-    "workers": 4,
-    "timeout": 90,
-    "retry": 120,
-    "queue_limit": 50,
-    "bulk": 10,
-    "orm": "default",
-    "redis": {
-        "host": "redis",
-        "port": 6379,
-        "db": 0,
-    }
-}
+# Celery Configuration
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL")
+CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND")
+CELERY_ACCEPT_CONTENT = ["application/json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = "UTC"
