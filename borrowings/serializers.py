@@ -3,7 +3,6 @@ from rest_framework import serializers
 
 from borrowings.models import Borrowing
 from books.serializers import BookSerializer
-from notifications.telegram import send_telegram_notification
 
 
 class BorrowingSerializer(serializers.ModelSerializer):
@@ -61,26 +60,16 @@ class BorrowingCreateSerializer(serializers.ModelSerializer):
         book = attrs.get("book")
         if book.inventory <= 0:
             raise serializers.ValidationError(
-                "This book is not available right now."
+                {"book": "This book is not available right now."}
             )
+
+        expected_return_date = attrs.get("expected_return_date")
+
+        if expected_return_date and (
+                expected_return_date <= serializers.DateTimeField()
+        ).to_internal_value("now").date():
+            raise serializers.ValidationError(
+                {"expected_return_date": "Return date must be in the future."}
+            )
+
         return attrs
-
-    def create(self, validated_data):
-        user_request = self.context.get("request")
-        book = validated_data.get("book")
-        with transaction.atomic():
-            book.inventory -= 1
-            book.save()
-            borrowing = Borrowing.objects.create(
-                user=user_request.user, book=book, **validated_data
-            )
-
-        message = (
-            f"<b>NEW BORROWING</b>\n"
-            f"User: {user_request.user.full_name} (ID: {user.id})\n"
-            f"Book: {book.title} (ID: {book.id})"
-            f"Expected return date: {borrowing.expected_return_date}"
-        )
-        send_telegram_notification(message)
-
-        return borrowing
