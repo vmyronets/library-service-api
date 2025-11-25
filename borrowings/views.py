@@ -2,6 +2,8 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from django.db import transaction
+
 from borrowings.models import Borrowing
 from borrowings.serializers import (
     BorrowingSerializer,
@@ -9,7 +11,8 @@ from borrowings.serializers import (
     BorrowingDetailSerializer,
     BorrowingCreateSerializer,
 )
-from rest_framework.exceptions import ValidationError
+from borrowings.tasks import send_borrowing_notification_task
+from payments.stripe_helper import create_stripe_session
 
 
 class BorrowingViewSet(viewsets.ModelViewSet):
@@ -44,13 +47,39 @@ class BorrowingViewSet(viewsets.ModelViewSet):
 
         return BorrowingSerializer
 
+    def perform_create(self, serializer):
+        # we store loans and link users
+        borrowing = serializer.save(user=self.request.user)
+
+        borrowing.book.inventory -= 1
+        borrowing.book.save()
+
+        # create stripe session
+        create_stripe_session(borrowing, self.request)
+
+        message = (
+            f"**NEW BORROWING**\n"
+            f"User: {borrowing.user.email}\n"
+            f"Book: {borrowing.book.title}\n"
+            f"Expected return date: {borrowing.expected_return_date}"
+        )
+        send_borrowing_notification_task.delay(message)
+
     @action(detail=True, methods=["post"], url_path="return")
     def return_book(self, request, pk=None):
+        """Return borrowed book and decrease inventory."""
         borrowing = self.get_object()
-        try:
+        if not borrowing.is_active:
+            return Response(
+                {"error": "This borrowing is already returned"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        with transaction.atomic():
             borrowing.return_book()
-        except ValidationError as e:
-            return Response(e.detail, status=status.HTTP_400_BAD_REQUEST)
+            if borrowing.actual_return_date > borrowing.expected_return_date:
+                pass
+
         return Response(
-            {"status": "book returned"}, status=status.HTTP_204_NO_CONTENT
+            {"status": "Book returned successfully."},
+            status=status.HTTP_200_OK
         )
