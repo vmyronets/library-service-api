@@ -1,5 +1,5 @@
-from django.db import transaction
 from rest_framework import serializers
+from datetime import date
 
 from borrowings.models import Borrowing
 from books.serializers import BookSerializer
@@ -65,9 +65,7 @@ class BorrowingCreateSerializer(serializers.ModelSerializer):
 
         expected_return_date = attrs.get("expected_return_date")
 
-        if expected_return_date and (
-                expected_return_date <= serializers.DateTimeField()
-        ).to_internal_value("now").date():
+        if expected_return_date and expected_return_date <= date.today():
             raise serializers.ValidationError(
                 {"expected_return_date": "Return date must be in the future."}
             )
