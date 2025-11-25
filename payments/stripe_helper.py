@@ -29,10 +29,10 @@ def create_stripe_session(borrowing, request):
     )
 
     success_url = request.build_absolute_uri(
-        reverse("payments:payment-success", args=[payment.id])
+        reverse("payments:payment-payment-success", args=[payment.id])
     )
     cancel_url = request.build_absolute_uri(
-        reverse("payments:payment-cancel", args=[payment.id])
+        reverse("payments:payment-payment-cancel", args=[payment.id])
     )
 
     # Creating a Stripe session
