@@ -30,8 +30,8 @@ class PaymentViewSet(viewsets.ModelViewSet):
     @action(methods=["GET"], detail=True, url_path="success")
     def payment_success(self, request, pk=None):
         """
-        Сюди Stripe перенаправляє користувача після успішної оплати.
-        Ми перевіряємо це і змінюємо статус платежу.
+        The user will be redirected here after successful payment.
+        We check this and change the payment status.
         """
         payment = self.get_object()
         session_id = payment.session_id
