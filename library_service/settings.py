@@ -186,6 +186,11 @@ CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = "UTC"
 
+if DEBUG:
+    # In development, run tasks immediately without requiring a Redis server
+    CELERY_TASK_ALWAYS_EAGER = True
+    CELERY_PROPAGATE_EXCEPTIONS = True
+
 # DRF Spectacular Settings
 SPECTACULAR_SETTINGS = {
     "TITLE": "Library Service API",
