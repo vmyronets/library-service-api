@@ -63,7 +63,10 @@ class BorrowingViewSet(viewsets.ModelViewSet):
             f"Book: {borrowing.book.title}\n"
             f"Expected return date: {borrowing.expected_return_date}"
         )
-        send_borrowing_notification_task.delay(message)
+        try:
+            send_borrowing_notification_task.delay(message)
+        except Exception as e:
+            print(f"Error sending Telegram notification: {e}")
 
     @action(detail=True, methods=["post"], url_path="return")
     def return_book(self, request, pk=None):
