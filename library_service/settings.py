@@ -197,3 +197,6 @@ SPECTACULAR_SETTINGS = {
     "DESCRIPTION": "RESTful API for a library with books, "
                    "borrowings and payments."
 }
+
+# Fine-tuning settings for borrowings
+FINE_MULTIPLIER = int(os.getenv("FINE_MULTIPLIER"))

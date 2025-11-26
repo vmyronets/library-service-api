@@ -6,24 +6,37 @@ from payments.models import Payment
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
-def create_stripe_session(borrowing, request):
+def create_stripe_session(
+        borrowing,
+        request,
+        payment_type=Payment.PaymentType.PAYMENT,
+        overdue_days=0
+):
     """
     Creates a Stripe Session for borrowing and records Payment in the database.
+    Allows as usual payment as well as overdue payment.
     """
-    # Calculation of the amount. We count the days.
-    # Minimum 1 day, even if they take it and return it today.
-    days_count = (borrowing.expected_return_date - borrowing.borrow_date).days
-    if days_count <= 0:
-        days_count = 1
+    book = borrowing.book
+    daily_fee = book.daily_fee
 
-    amount = int(days_count * borrowing.book.daily_fee * 100)
+    if payment_type == Payment.PaymentType.FINE:
+        amount = daily_fee * overdue_days * settings.FINE_MULTIPLIER
+        product_name = f"Overdue Fine: {book.title} ({overdue_days} days)"
+    else:
+        days_count = (borrowing.expected_return_date - borrowing.borrow_date).days
+        if days_count <= 0:
+            days_count = 1
+        amount = daily_fee * days_count
+        product_name = f"Borrowing: {book.title}"
+
+    unit_amount_cents = int(amount * 100)
 
     payment = Payment.objects.create(
         status=Payment.PaymentStatus.PENDING,
-        type=Payment.PaymentType.PAYMENT,
+        type=payment_type,
         borrowing=borrowing,
         user=borrowing.user,
-        money_to_pay=amount / 100,  # We store in dollars in the database
+        money_to_pay=amount,  # We store in dollars in the database
         session_url="",
         session_id=""
     )
@@ -42,9 +55,9 @@ def create_stripe_session(borrowing, request):
             "price_data": {
                 "currency": "usd",
                 "product_data": {
-                    "name": f"Borrowing: {borrowing.book.title}",
+                    "name": product_name,
                 },
-                "unit_amount": amount,
+                "unit_amount": unit_amount_cents,
             },
             "quantity": 1,
         }],
