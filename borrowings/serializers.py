@@ -24,7 +24,7 @@ class BorrowingListSerializer(BorrowingSerializer):
         many=False, read_only=True, slug_field="title"
     )
     user = serializers.SlugRelatedField(
-        many=False, read_only=True, slug_field="full_name"
+        many=False, read_only=True, slug_field="email"
     )
 
     class Meta:
@@ -35,7 +35,7 @@ class BorrowingListSerializer(BorrowingSerializer):
 class BorrowingDetailSerializer(BorrowingSerializer):
     book = BookSerializer(many=False, read_only=True)
     user = serializers.SlugRelatedField(
-        many=False, read_only=True, slug_field="full_name"
+        many=False, read_only=True, slug_field="email"
     )
 
     class Meta:
