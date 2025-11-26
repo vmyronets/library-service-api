@@ -3,6 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.db import transaction
+from django.utils import timezone
 
 from borrowings.models import Borrowing
 from borrowings.serializers import (
@@ -11,8 +12,9 @@ from borrowings.serializers import (
     BorrowingDetailSerializer,
     BorrowingCreateSerializer,
 )
-from borrowings.tasks import send_borrowing_notification_task
+from payments.models import Payment
 from payments.stripe_helper import create_stripe_session
+from borrowings.tasks import send_borrowing_notification_task
 
 
 class BorrowingViewSet(viewsets.ModelViewSet):
@@ -71,7 +73,9 @@ class BorrowingViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["post"], url_path="return")
     def return_book(self, request, pk=None):
         """Return borrowed book and decrease inventory."""
+
         borrowing = self.get_object()
+
         if not borrowing.is_active:
             return Response(
                 {"error": "This borrowing is already returned"},
@@ -79,8 +83,19 @@ class BorrowingViewSet(viewsets.ModelViewSet):
             )
         with transaction.atomic():
             borrowing.return_book()
-            if borrowing.actual_return_date > borrowing.expected_return_date:
-                pass
+            actual_return_date = borrowing.actual_return_date
+            expected_return_date = borrowing.expected_return_date
+
+            if actual_return_date > expected_return_date:
+                overdue_days = (actual_return_date - expected_return_date).days
+
+                if overdue_days > 0:
+                    create_stripe_session(
+                        borrowing,
+                        request,
+                        payment_type=Payment.PaymentType.FINE,
+                        overdue_days=overdue_days
+                    )
 
         return Response(
             {"status": "Book returned successfully."},
