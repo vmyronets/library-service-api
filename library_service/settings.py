@@ -51,7 +51,6 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "books",
     "borrowings",
-    "notifications",
     "payments",
     "users",
 ]
