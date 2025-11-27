@@ -1,7 +1,7 @@
 from celery import shared_task
 from django.utils import timezone
 from borrowings.models import Borrowing
-from notifications.telegram import send_telegram_notification
+from borrowings.telegram_helper import send_telegram_notification
 
 
 @shared_task
