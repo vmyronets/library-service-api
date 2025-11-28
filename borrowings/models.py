@@ -1,5 +1,5 @@
 from django.db import models
-from django.core.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError
 from django.conf import settings
 from django.db import transaction
 from django.utils import timezone
@@ -29,18 +29,11 @@ class Borrowing(models.Model):
             raise ValidationError(
                 "Expected return date must be after borrow date."
             )
-        if (
-            self.is_active and self.expected_return_date
-            <= timezone.now().date()
-        ):
-            raise ValidationError(
-                "Expected return date must be in the future."
-            )
-        if self.book.inventory <= 0:
-            raise ValidationError("This book is not available right now.")
 
-        if self.is_active:
-            raise ValidationError("This book is already borrowed.")
+        if self.expected_return_date <= timezone.now().date():
+            raise ValidationError(
+                "Expected return date must be strictly in the future."
+            )
 
     @transaction.atomic
     def return_book(self):
