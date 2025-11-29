@@ -52,8 +52,8 @@ class AuthenticatedBooksAPITest(TestCase):
             inventory=10,
             daily_fee=10.00
         )
-        response = self.client.get(
-            reverse("books:book-detail", kwargs={"pk": book.id})
+        response = self.client.get(reverse(
+            "books:book-detail", kwargs={"pk": book.id})
         )
         books = Book.objects.all()
         serializer = BookSerializer(books, many=True)
@@ -61,8 +61,8 @@ class AuthenticatedBooksAPITest(TestCase):
         self.assertEqual(response.data, serializer.data[0])
 
     def test_book_delete_auth_required(self):
-        response = self.client.delete(
-            reverse("books:book-detail", kwargs={"pk": 1})
+        response = self.client.delete(reverse(
+            "books:book-detail", kwargs={"pk": 1})
         )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
@@ -71,8 +71,8 @@ class AuthenticatedBooksAPITest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_book_update_admin_required(self):
-        response = self.client.put(
-            reverse("books:book-detail", kwargs={"pk": 1})
+        response = self.client.put(reverse(
+            "books:book-detail", kwargs={"pk": 1})
         )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
@@ -90,10 +90,7 @@ class AdminBooksAPITest(TestCase):
             "title": "Test Book",
             "author": "Test Author",
             "inventory": 10,
-            "daily_fee": 10.00
+            "daily_fee": 10.00,
         }
         response = self.client.post(reverse("books:book-list"), data=book_data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
-
-

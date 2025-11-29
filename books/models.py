@@ -9,9 +9,7 @@ class Book(models.Model):
     title = models.CharField(max_length=100, unique=True)
     author = models.CharField(max_length=100)
     cover = models.CharField(
-        max_length=4,
-        choices=BookCover.choices,
-        default=BookCover.HARD
+        max_length=4, choices=BookCover.choices, default=BookCover.HARD
     )
     inventory = models.PositiveIntegerField()
     daily_fee = models.DecimalField(
