@@ -79,7 +79,7 @@ class BorrowingViewSet(viewsets.ModelViewSet):
         if not borrowing.is_active:
             return Response(
                 {"error": "This borrowing is already returned"},
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
             )
         with transaction.atomic():
             borrowing.return_book()
@@ -94,7 +94,7 @@ class BorrowingViewSet(viewsets.ModelViewSet):
                         borrowing,
                         request,
                         payment_type=Payment.PaymentType.FINE,
-                        overdue_days=overdue_days
+                        overdue_days=overdue_days,
                     )
 
         return Response(

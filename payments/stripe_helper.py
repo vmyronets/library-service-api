@@ -23,7 +23,10 @@ def create_stripe_session(
         amount = daily_fee * overdue_days * settings.FINE_MULTIPLIER
         product_name = f"Overdue Fine: {book.title} ({overdue_days} days)"
     else:
-        days_count = (borrowing.expected_return_date - borrowing.borrow_date).days
+        days_count = (
+                borrowing.expected_return_date - borrowing.borrow_date
+        ).days
+
         if days_count <= 0:
             days_count = 1
         amount = daily_fee * days_count

@@ -45,8 +45,10 @@ def get_message(instance):
     book_title = instance.book.title
     book_author = instance.book.author
     borrowing_time = get_borrow_time(instance)
-    message = (f"New borrowing:\n"
-               f"User: {user_name}, Book: {book_title}, {book_author}\n"
-               f"Borrow for: {borrowing_time}\n"
-               f"Borrowing end: {instance.expected_return_date}")
+    message = (
+        f"New borrowing:\n"
+        f"User: {user_name}, Book: {book_title}, {book_author}\n"
+        f"Borrow for: {borrowing_time}\n"
+        f"Borrowing end: {instance.expected_return_date}"
+    )
     return message

@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('borrowings', '0002_initial'),
+        ("borrowings", "0002_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='borrowing',
-            name='borrow_date',
-            field=models.DateField(auto_now_add=True, verbose_name='Borrow date'),
+            model_name="borrowing",
+            name="borrow_date",
+            field=models.DateField(
+                auto_now_add=True, verbose_name="Borrow date"
+            ),
         ),
     ]

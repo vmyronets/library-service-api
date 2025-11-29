@@ -8,7 +8,7 @@ from rest_framework.test import APIClient
 
 from borrowings.models import Borrowing
 from books.models import Book
-from borrowings.serializers import (BorrowingCreateSerializer)
+from borrowings.serializers import BorrowingCreateSerializer
 
 
 class BorrowingsAPITest(TestCase):
@@ -19,28 +19,21 @@ class BorrowingsAPITest(TestCase):
         )
         self.client.force_authenticate(user=self.user)
         self.book_in_inventory = Book.objects.create(
-            title="Test Book",
-            author="Test Author",
-            inventory=10,
-            daily_fee=10.00
+            title="Test Book", author="Test Author", inventory=10, daily_fee=10.00
         )
         self.book_out_of_inventory = Book.objects.create(
-            title="Test Book 2",
-            author="Test Author 2",
-            inventory=0,
-            daily_fee=20.00
+            title="Test Book 2", author="Test Author 2", inventory=0, daily_fee=20.00
         )
         self.borrow_date = timezone.now().date()
         self.actual_return_date = self.borrow_date + timezone.timedelta(days=7)
 
     def test_borrow_date_less_than_return_date(self):
-        invalid_return_date = (self.actual_return_date
-                               - timezone.timedelta(days=8))
+        invalid_return_date = self.actual_return_date - timezone.timedelta(days=8)
         borrowing = Borrowing(
             borrow_date=self.borrow_date,
             expected_return_date=invalid_return_date,
             book=self.book_in_inventory,
-            user=self.user
+            user=self.user,
         )
         with self.assertRaises(ValidationError):
             borrowing.clean()
@@ -50,7 +43,7 @@ class BorrowingsAPITest(TestCase):
             "borrow_date": self.borrow_date,
             "expected_return_date": self.actual_return_date,
             "book": self.book_out_of_inventory.id,
-            "user": self.user.id
+            "user": self.user.id,
         }
         serializer = BorrowingCreateSerializer(data=borrowing_data)
 
@@ -66,7 +59,7 @@ class BorrowingsAPITest(TestCase):
             "borrow_date": self.borrow_date,
             "expected_return_date": self.actual_return_date,
             "book": self.book_in_inventory.id,
-            "user": self.user.id
+            "user": self.user.id,
         }
         serializer = BorrowingCreateSerializer(data=borrowing_data)
         serializer.is_valid(raise_exception=True)
@@ -83,7 +76,7 @@ class BorrowingsAPITest(TestCase):
                 "book": self.book_in_inventory.id,
                 "expected_return_date": self.actual_return_date,
             },
-            format="json"
+            format="json",
         )
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)

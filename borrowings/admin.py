@@ -12,7 +12,7 @@ class BorrowingAdmin(admin.ModelAdmin):
         "book",
         "borrow_date",
         "expected_return_date",
-        "is_active"
+        "is_active",
     )
     list_filter = ("is_active", "book", "user")
     search_fields = ("user__email", "book__title")
