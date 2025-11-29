@@ -4,7 +4,6 @@ from borrowings.models import Borrowing
 
 
 class Payment(models.Model):
-
     class PaymentStatus(models.TextChoices):
         PENDING = "PENDING", "Pending"
         PAID = "PAID", "Paid"
