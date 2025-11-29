@@ -25,12 +25,16 @@ class Borrowing(models.Model):
     is_active = models.BooleanField(default=True)
 
     def clean(self):
-        if self.expected_return_date <= self.borrow_date:
+        if not self.expected_return_date:
+            return
+
+        start_date = self.borrow_date or timezone.now().date()
+        if self.expected_return_date < start_date:
             raise ValidationError(
                 "Expected return date must be after borrow date."
             )
 
-        if self.expected_return_date <= timezone.now().date():
+        if self.expected_return_date < timezone.now().date():
             raise ValidationError(
                 "Expected return date must be strictly in the future."
             )
